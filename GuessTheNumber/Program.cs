@@ -17,12 +17,14 @@ namespace GuessTheNumber
             int upperBound;
 
             // Error check upper bound
-            while (!int.TryParse(input, out upperBound) || upperBound <= 1)
+            while (!int.TryParse(input, out upperBound) || upperBound <= 1 || upperBound == int.MaxValue)
             {
                 if (!int.TryParse(input, out _))
-                    Console.WriteLine("That's not a number, try again.");
-                else
+                    Console.WriteLine("That's not an integer, try again.");
+                else if (upperBound <= 1)
                     Console.WriteLine("That bound is <= 1, try again.");
+                else
+                    Console.WriteLine("That bound is too big, try again."); // Check for overflow
 
                 Console.Write("Enter an upper bound > 1: ");
                 input = Console.ReadLine();
