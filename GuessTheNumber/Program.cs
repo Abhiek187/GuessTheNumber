@@ -8,19 +8,51 @@ namespace GuessTheNumber
 {
     class Program
     {
-        static void Main(string[] args)
+        static readonly Random rand = new Random(); // Initialize random seed for entire program
+
+        static void PlayGame()
         {
-            Random rand = new Random();
-            Console.Write("Enter an upper bound: "); // Ask for the highest number to guess
-            int upperBound = int.Parse(Console.ReadLine());
+            Console.Write("Enter an upper bound > 1: "); // Ask for the highest number to guess
+            string input = Console.ReadLine();
+            int upperBound;
+
+            // Error check upper bound
+            while (!int.TryParse(input, out upperBound) || upperBound <= 1)
+            {
+                if (!int.TryParse(input, out _))
+                    Console.WriteLine("That's not a number, try again.");
+                else
+                    Console.WriteLine("That bound is <= 1, try again.");
+
+                Console.Write("Enter an upper bound > 1: ");
+                input = Console.ReadLine();
+            }
+
             int randNum = rand.Next(1, upperBound + 1); // Generates a random number between 1 and user's input
             double tries = Math.Ceiling(Math.Log(upperBound, 2)); // Gives user a fair shot at guessing the number
-            Console.WriteLine($"I'm thinking of a number between 1 and {upperBound}. You have {tries} tries. Can you guess what it is?");
+            Console.WriteLine($"I'm thinking of a number between 1 and {upperBound}. You have {tries} " +
+                (tries == 1 ? "try" : "tries") + ". Can you guess what it is?"); // Account for grammar
 
+            // Game loop
             for (double attempt = 1; attempt <= tries; attempt++)
             {
                 Console.Write($"Guess #{attempt}: ");
-                int guess = int.Parse(Console.ReadLine());
+                input = Console.ReadLine();
+                int guess;
+
+                // Error check guess
+                while (!int.TryParse(input, out guess) || guess < 1 || guess > upperBound)
+                {
+                    if (!int.TryParse(input, out _))
+                        Console.WriteLine("That's not a number, try again.");
+                    else if (guess < 1)
+                        Console.WriteLine("That guess is < 1, try again.");
+                    else
+                        Console.WriteLine($"That guess is > {upperBound}, try again.");
+
+                    Console.Write($"Guess #{attempt}: ");
+                    input = Console.ReadLine();
+                }
 
                 if (guess < randNum)
                 {
@@ -45,6 +77,29 @@ namespace GuessTheNumber
                     Console.WriteLine($"Sorry, you lose. The answer is {randNum}.");
                 }
             }
+        }
+
+        static void Main(string[] args)
+        {
+            Console.WriteLine("Welcome to Guess the Number!");
+            char playAgain;
+
+            do
+            {
+                PlayGame(); // Keep playing until user wants to quit
+                Console.Write("Do you want to play again? (y/n): ");
+                string input = Console.ReadLine();
+                
+                // Error check try again prompt
+                while (!char.TryParse(input, out playAgain) ||
+                    (Char.ToLower(playAgain) != 'y' && Char.ToLower(playAgain) != 'n'))
+                {
+                    Console.Write("Please enter y or n: ");
+                    input = Console.ReadLine();
+                }
+            } while (Char.ToLower(playAgain) == 'y');
+
+            Console.WriteLine("Thank you for playing!");
         }
     }
 }
